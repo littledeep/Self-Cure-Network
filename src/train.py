@@ -89,7 +89,7 @@ class Res18Feature(nn.Module):
         fc_in_dim = list(resnet.children())[-1].in_features # original fc layer's in dimention 512
    
         self.fc = nn.Linear(fc_in_dim, num_classes) # new fc layer 512x7
-        self.alpha = nn.Sequential(nn.Linear(fc_in_dim, 1),nn.Sigmoid())
+        self.alpha = nn.Sequential(nn.Linear(fc_in_dim, 1),nn.Sigmoid())         # 创新，准确性估计模块的准确性
 
     def forward(self, x):
         x = self.features(x)
@@ -231,7 +231,7 @@ def run_training():
             # diff  = margin_1 - (high_mean - low_mean)
             diff  = low_mean - high_mean + margin_1
 
-            if diff > 0:
+            if diff > 0:  # 创新：Loss实现，一个创新点，无非就是使用了一个判断
                 RR_loss = diff
             else:
                 RR_loss = 0.0
@@ -246,7 +246,7 @@ def run_training():
             correct_num = torch.eq(predicts, targets).sum()
             correct_sum += correct_num
 
-            # Relabel samples
+            # Relabel samples                                                  # 创新点2 ， relabel模块的实现，就是一个判断
             if i >= args.relabel_epoch:
                 sm = torch.softmax(outputs, dim = 1)
                 Pmax, predicted_labels = torch.max(sm, 1) # predictions
